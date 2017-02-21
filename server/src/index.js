@@ -13,7 +13,7 @@ app.get('/images', async (req, res) => {
     const media = await getNearbyMedia(session, locationId)
 
     const imageSize = 4;
-    const images = media.map(m => m._params.images[imageSize]);
+    const images = media.map(m => m._params.images[imageSize]).filter(f => f);
 
     return res.json(images);
   } catch (e) {

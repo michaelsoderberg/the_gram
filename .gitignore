@@ -9,7 +9,7 @@ server/src/api/cookies/account.json
 /coverage
 
 # production
-/build
+server/build
 
 # misc
 .DS_Store
