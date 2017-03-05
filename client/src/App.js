@@ -1,27 +1,47 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import 'whatwg-fetch';
-import './App.css';
+import React, { Component, createElement } from "react";
+import "./App.css";
 
-const Image = ({url}) => <img src={url} />
+import MediaFeed from "./components/MediaFeed";
+import Image from "./components/Image";
+import Video from "./components/Video";
+import Select, { Option } from "./components/Select";
+import LazyLoad from "react-lazyload";
+
+const mediaTypes = { Video, Image };
+
+const buildURL = opts =>
+  `https://www.reddit.com/r/${opts.selected}/top/.json?t=month&limit=10`;
+
+const setSelected = selected => state => ({ ...state, selected });
+
+const renderMedia = (item, key) => (
+  <LazyLoad key={key} height="100vh">
+    {createElement(mediaTypes[item.type], item)}
+  </LazyLoad>
+);
+
 class App extends Component {
-  state = { images: [], loading: true };
-
-  componentWillMount() {
-    fetch(`http://localhost:8000/images`)
-      .then(res => res.json())
-      .then(images => this.setState({ images, loading: false }));
-  }
+  state = {
+    selected: "NatureIsFuckingLit",
+    options: [
+      { value: "NatureIsFuckingLit", children: "NatureIsFuckingLit" },
+      { value: "EarthPorn", children: "EarthPorn" },
+      { value: "Gifs", children: "Gifs" },
+      { value: "NatureGifs", children: "NatureGifs" },
+      { value: "DamnNatureYouScary", children: "DamnNatureYouScary" },
+    ]
+  };
+  setFeed = e => this.setState(setSelected(e.target.value));
   render() {
-    console.log(this.state);
-    const {images, loading} = this.state;
+    const { selected, options } = this.state;
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Lysande Sickan!</h2>
-        </div>
-        {loading ? <pre>laddar...</pre> : images.map(Image)}
+        <Select value={selected} onChange={this.setFeed}>
+          {options.map(Option)}
+        </Select>
+        <MediaFeed src={buildURL({ selected })}>
+          {media => media.map(renderMedia)}
+        </MediaFeed>
       </div>
     );
   }
